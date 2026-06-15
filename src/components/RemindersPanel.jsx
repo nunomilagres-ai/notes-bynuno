@@ -3,6 +3,7 @@ import { Plus, Check, X, Bell } from 'lucide-react'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
 import ReminderItem from './ReminderItem'
+import DateTimeField from './DateTimeField'
 
 function ReminderForm({ notes, onSave, onCancel }) {
   const [title, setTitle] = useState('')
@@ -16,8 +17,7 @@ function ReminderForm({ notes, onSave, onCancel }) {
         className="w-full text-xs bg-transparent focus:outline-none mb-1.5 font-medium" style={{ color: '#1a1614' }} />
       <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Nota (opcional)…" rows={2}
         className="w-full text-xs bg-transparent focus:outline-none resize-none mb-1.5" style={{ color: '#5a4e44' }} />
-      <input type="datetime-local" value={due} onChange={e => setDue(e.target.value)} required
-        className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#5a4e44' }} />
+      <div className="mb-2"><DateTimeField value={due} onChange={setDue} /></div>
       {notes.length > 0 && (
         <select value={noteId} onChange={e => setNoteId(e.target.value)}
           className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#7a6e64' }}>

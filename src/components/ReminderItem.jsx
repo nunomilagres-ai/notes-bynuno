@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Check, Trash2, AlertCircle, Pencil, X } from 'lucide-react'
 import { fmtDue } from '@/lib/api'
+import DateTimeField from './DateTimeField'
 
 function EditForm({ r, allNotes, onSave, onCancel }) {
   const [title, setTitle] = useState(r.title)
   const [body, setBody] = useState(r.body || '')
-  const [due, setDue] = useState(r.due_date ? r.due_date.slice(0, 16) : '')
+  const [due, setDue] = useState(r.due_date || '')
   const [noteId, setNoteId] = useState(r.note_id || '')
   return (
     <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ ...r, title: title.trim(), body: body || null, due_date: due, note_id: noteId || null }) }}
@@ -14,8 +15,7 @@ function EditForm({ r, allNotes, onSave, onCancel }) {
         className="w-full text-xs font-medium bg-transparent focus:outline-none mb-1" style={{ color: '#1a1614' }} />
       <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Nota (opcional)…" rows={2}
         className="w-full text-xs bg-transparent focus:outline-none resize-none mb-1" style={{ color: '#5a4e44' }} />
-      <input type="datetime-local" value={due} onChange={e => setDue(e.target.value)} required
-        className="w-full text-xs bg-transparent focus:outline-none mb-1.5" style={{ color: '#5a4e44' }} />
+      <div className="mb-1.5"><DateTimeField value={due} onChange={setDue} /></div>
       {allNotes && allNotes.length > 0 && (
         <select value={noteId} onChange={e => setNoteId(e.target.value)}
           className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#7a6e64' }}>

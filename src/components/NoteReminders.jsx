@@ -1,8 +1,9 @@
 // NoteReminders.jsx — reminders linked to a specific note, shown inside NoteEditor
-import { useState, useEffect } from 'react'
-import { Bell, Plus, Check, X, Pencil, Trash2, AlertCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Bell, Plus, Check, X, Trash2, AlertCircle } from 'lucide-react'
 import { api, fmtDue } from '@/lib/api'
 import { toast } from 'sonner'
+import DateTimeField from './DateTimeField'
 
 function QuickForm({ noteId, onSave, onCancel }) {
   const [title, setTitle] = useState('')
@@ -12,8 +13,7 @@ function QuickForm({ noteId, onSave, onCancel }) {
       className="flex flex-col gap-1 p-2 rounded-lg" style={{ background: '#FFFCF8', border: '1px solid #e4ddd4' }}>
       <input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Título da tarefa…"
         className="text-xs font-medium bg-transparent focus:outline-none" style={{ color: '#1a1614' }} />
-      <input type="datetime-local" value={due} onChange={e => setDue(e.target.value)} required
-        className="text-xs bg-transparent focus:outline-none" style={{ color: '#5a4e44' }} />
+      <DateTimeField value={due} onChange={setDue} />
       <div className="flex gap-1.5 mt-0.5">
         <button type="submit" className="flex-1 py-1 rounded text-xs font-medium text-white flex items-center justify-center gap-1" style={{ background: '#E8A838' }}>
           <Check size={10} /> Criar

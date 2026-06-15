@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Pencil, Trash2, StickyNote, Bell, LayoutDashboard } from 'lucide-react'
+import { Plus, Pencil, Trash2, StickyNote, Bell, LayoutDashboard, CalendarDays } from 'lucide-react'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
 import TopicForm from './TopicForm'
@@ -15,7 +15,7 @@ function N({ label, icon, active, badge, onClick }) {
   )
 }
 
-export default function TopicsSidebar({ topics, setTopics, selectedTopic, setSelectedTopic, showReminders, onSelectReminders, pendingReminders, onShowDashboard, showDashboard }) {
+export default function TopicsSidebar({ topics, setTopics, selectedTopic, setSelectedTopic, showReminders, onSelectReminders, pendingReminders, onShowDashboard, showDashboard, onShowCalendar, showCalendar }) {
   const [creating, setCreating] = useState(false)
   const [editId, setEditId] = useState(null)
 
@@ -41,8 +41,9 @@ export default function TopicsSidebar({ topics, setTopics, selectedTopic, setSel
       </div>
       <div className="flex-1 overflow-y-auto py-1.5 px-2 flex flex-col gap-0.5">
         <N label="Dashboard" icon={<LayoutDashboard size={12}/>} active={showDashboard} onClick={onShowDashboard}/>
-        <N label="Todas as notas" icon={<StickyNote size={12}/>} active={!showReminders&&!showDashboard&&selectedTopic===null} onClick={()=>{setSelectedTopic(null);onSelectReminders(false)}}/>
-        <N label="Lembretes" icon={<Bell size={12}/>} badge={pendingReminders||undefined} active={showReminders&&!showDashboard} onClick={()=>onSelectReminders(true)}/>
+        <N label="Calendário" icon={<CalendarDays size={12}/>} active={showCalendar} onClick={onShowCalendar}/>
+        <N label="Todas as notas" icon={<StickyNote size={12}/>} active={!showReminders&&!showDashboard&&!showCalendar&&selectedTopic===null} onClick={()=>{setSelectedTopic(null);onSelectReminders(false)}}/>
+        <N label="Lembretes" icon={<Bell size={12}/>} badge={pendingReminders||undefined} active={showReminders&&!showDashboard&&!showCalendar} onClick={()=>onSelectReminders(true)}/>
         <div className="my-1 border-t" style={{borderColor:'#f0ece4'}}/>
         <N label="📋 Geral" active={!showReminders&&selectedTopic==='none'} onClick={()=>{setSelectedTopic('none');onSelectReminders(false)}}/>
         {creating && <TopicForm onSave={doCreate} onCancel={()=>setCreating(false)}/>}
