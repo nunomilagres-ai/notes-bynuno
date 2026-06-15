@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #FAF7F2;
+  color: #1a1614;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbars ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar            { width: 5px; height: 5px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: #E4DDD4; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #c8bfb6; }
+
+/* ─── Markdown preview ──────────────────────────────────────────────────────── */
+.md-h1 { font-size: 1.6em; font-weight: 700; margin: .6em 0 .3em; color: #1a1614; }
+.md-h2 { font-size: 1.3em; font-weight: 700; margin: .5em 0 .3em; color: #1a1614; }
+.md-h3 { font-size: 1.1em; font-weight: 600; margin: .5em 0 .3em; color: #292219; }
+.md-h4,.md-h5,.md-h6 { font-weight: 600; margin: .4em 0 .2em; color: #3d3028; }
+.md-p  { margin: .35em 0; color: #5a4e44; line-height: 1.75; }
+.md-pre {
+  background: #f0ece4; border: 1px solid #e4ddd4; border-radius: 8px;
+  padding: 10px 14px; margin: .6em 0; overflow-x: auto;
+}
+.md-pre code { font-family: 'JetBrains Mono', monospace; font-size: .82em; color: #C97A20; }
+.md-code {
+  background: #f0ece4; border-radius: 4px;
+  padding: 1px 5px; font-family: monospace; font-size: .84em; color: #C97A20;
+}
+.md-ul  { list-style: disc; padding-left: 1.4em; margin: .3em 0; }
+.md-ol  { list-style: decimal; padding-left: 1.4em; margin: .3em 0; }
+.md-li  { margin: .2em 0; color: #5a4e44; }
+.md-blockquote {
+  border-left: 3px solid #E8A838; padding-left: 14px;
+  color: #7a6e64; font-style: italic; margin: .5em 0;
+}
+.md-hr  { border: none; border-top: 1px solid #e4ddd4; margin: 1em 0; }
+.md-a   { color: #C97A20; text-decoration: underline; }
+.md-a:hover { opacity: .75; }
+.md-task { list-style: none; padding-left: 0; }
+.md-task li { display: flex; align-items: flex-start; gap: 6px; margin: .25em 0; color: #5a4e44; }
+.md-task input[type=checkbox] { margin-top: 3px; accent-color: #E8A838; }
+
+/* ─── Focus ring ────────────────────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid #E8A838; outline-offset: 2px; border-radius: 4px; }
+
+/* ─── Animations ────────────────────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in .18s ease-out; }
+
+/* ─── Utility ───────────────────────────────────────────────────────────────── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,0 +1,87 @@
+import { useState } from 'react'
+import { Plus, Check, X, Bell } from 'lucide-react'
+import { api } from '@/lib/api'
+import { toast } from 'sonner'
+import ReminderItem from './ReminderItem'
+
+function ReminderForm({ notes, onSave, onCancel }) {
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [due, setDue] = useState('')
+  const [noteId, setNoteId] = useState('')
+  return (
+    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ title: title.trim(), body: body || null, due_date: due, note_id: noteId || null }) }}
+      className="p-3 rounded-lg" style={{ background: '#FFFCF8', border: '1px solid #e4ddd4' }}>
+      <input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Título do lembrete…"
+        className="w-full text-xs bg-transparent focus:outline-none mb-1.5 font-medium" style={{ color: '#1a1614' }} />
+      <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Nota (opcional)…" rows={2}
+        className="w-full text-xs bg-transparent focus:outline-none resize-none mb-1.5" style={{ color: '#5a4e44' }} />
+      <input type="datetime-local" value={due} onChange={e => setDue(e.target.value)} required
+        className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#5a4e44' }} />
+      {notes.length > 0 && (
+        <select value={noteId} onChange={e => setNoteId(e.target.value)}
+          className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#7a6e64' }}>
+          <option value="">— Ligar a nota (opcional) —</option>
+          {notes.map(n => <option key={n.id} value={n.id}>{n.title}</option>)}
+        </select>
+      )}
+      <div className="flex gap-1.5">
+        <button type="submit" className="flex-1 py-1 rounded text-xs font-medium text-white flex items-center justify-center gap-1" style={{ background: '#E8A838' }}>
+          <Check size={10} /> Guardar
+        </button>
+        <button type="button" onClick={onCancel} className="px-2 py-1 rounded text-xs" style={{ background: '#f0ece4', color: '#7a6e64' }}>
+          <X size={10} />
+        </button>
+      </div>
+    </form>
+  )
+}
+
+export default function RemindersPanel({ reminders, setReminders, allNotes }) {
+  const [creating, setCreating] = useState(false)
+  const [tab, setTab] = useState('pending')
+
+  async function doCreate(d) {
+    try { const r = await api.reminders.create(d); setReminders(p => [r, ...p]); setCreating(false); toast.success('Lembrete criado') }
+    catch { toast.error('Erro ao criar') }
+  }
+  async function doToggle(r) {
+    try { const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 }); setReminders(p => p.map(x => x.id === r.id ? { ...x, ...u } : x)) }
+    catch { toast.error('Erro') }
+  }
+  async function doDelete(id) {
+    try { await api.reminders.delete(id); setReminders(p => p.filter(x => x.id !== id)) }
+    catch { toast.error('Erro ao apagar') }
+  }
+
+  const pending = reminders.filter(r => !r.completed).sort((a, b) => a.due_date.localeCompare(b.due_date))
+  const done = reminders.filter(r => r.completed)
+  const list = tab === 'pending' ? pending : done
+
+  return (
+    <div className="flex flex-col h-full" style={{ background: '#fff' }}>
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between flex-shrink-0" style={{ borderBottom: '1px solid #f0ece4' }}>
+        <div className="flex items-center gap-2">
+          <Bell size={14} style={{ color: '#E8A838' }} />
+          <span className="text-sm font-semibold" style={{ color: '#1a1614' }}>Lembretes</span>
+        </div>
+        <button onClick={() => setCreating(c => !c)} className="w-6 h-6 rounded flex items-center justify-center" style={{ background: '#FFF6E8', color: '#D4822E', border: '1px solid #F0D9A8' }}>
+          <Plus size={12} />
+        </button>
+      </div>
+      <div className="flex px-4 pt-2 flex-shrink-0 gap-1">
+        {[['pending', 'Pendentes (' + pending.length + ')'], ['done', 'Concluídos']].map(([k, lbl]) => (
+          <button key={k} onClick={() => setTab(k)} className="px-3 py-1 text-xs font-medium rounded-t-lg"
+            style={{ background: tab === k ? '#FFF6E8' : 'transparent', color: tab === k ? '#D4822E' : '#a89f96', borderBottom: tab === k ? '2px solid #E8A838' : '2px solid transparent' }}>
+            {lbl}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+        {creating && <ReminderForm notes={allNotes} onSave={doCreate} onCancel={() => setCreating(false)} />}
+        {list.length === 0 && <p className="text-xs text-center mt-8" style={{ color: '#a89f96' }}>Nenhum lembrete {tab === 'pending' ? 'pendente' : 'concluído'}.</p>}
+        {list.map(r => <ReminderItem key={r.id} r={r} onToggle={doToggle} onDelete={doDelete} />)}
+      </div>
+    </div>
+  )
+}
