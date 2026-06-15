@@ -49,6 +49,10 @@ export default function RemindersPanel({ reminders, setReminders, allNotes }) {
     try { const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 }); setReminders(p => p.map(x => x.id === r.id ? { ...x, ...u } : x)) }
     catch { toast.error('Erro') }
   }
+  async function doEdit(updated) {
+    try { const u = await api.reminders.update(updated.id, updated); setReminders(p => p.map(x => x.id === updated.id ? { ...x, ...u } : x)); toast.success('Lembrete actualizado') }
+    catch { toast.error('Erro ao actualizar') }
+  }
   async function doDelete(id) {
     try { await api.reminders.delete(id); setReminders(p => p.filter(x => x.id !== id)) }
     catch { toast.error('Erro ao apagar') }
@@ -80,7 +84,7 @@ export default function RemindersPanel({ reminders, setReminders, allNotes }) {
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
         {creating && <ReminderForm notes={allNotes} onSave={doCreate} onCancel={() => setCreating(false)} />}
         {list.length === 0 && <p className="text-xs text-center mt-8" style={{ color: '#a89f96' }}>Nenhum lembrete {tab === 'pending' ? 'pendente' : 'concluído'}.</p>}
-        {list.map(r => <ReminderItem key={r.id} r={r} onToggle={doToggle} onDelete={doDelete} />)}
+        {list.map(r => <ReminderItem key={r.id} r={r} allNotes={allNotes} onToggle={doToggle} onDelete={doDelete} onEdit={doEdit} />)}
       </div>
     </div>
   )
