@@ -78,7 +78,7 @@ export default function NotesPage() {
   const topicLabel = selectedTopic === null ? 'Todas as notas' : selectedTopic === 'none' ? '📋 Geral' : (topics.find(t => t.id === selectedTopic)?.name || 'Notas')
 
   const sidebar = <TopicsSidebar topics={topics} setTopics={setTopics} selectedTopic={selectedTopic} setSelectedTopic={t=>{setSelectedTopic(t);setMobilePane('list')}} showReminders={showReminders} onSelectReminders={handleSelectReminders} pendingReminders={pendingReminders}/>
-  const list = <NotesList notes={notes} selectedId={selectedNote?.id} search={search} setSearch={setSearch} onSelect={openNote} onNew={newNote} topicLabel={topicLabel}/>
+  const list = <NotesList notes={notes} selectedId={selectedNote?.id} search={search} setSearch={setSearch} onSelect={openNote} onNew={newNote} topicLabel={topicLabel} sidebarOpen={sidebarOpen} topics={topics} selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} showReminders={showReminders} onSelectReminders={handleSelectReminders}/>
   const editor = showReminders
     ? <RemindersPanel reminders={reminders} setReminders={setReminders} allNotes={notes}/>
     : selectedNote

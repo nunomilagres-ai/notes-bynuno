@@ -1,18 +1,43 @@
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, ChevronDown } from 'lucide-react'
 import { fmtDate } from '@/lib/api'
 
-export default function NotesList({ notes, selectedId, search, setSearch, onSelect, onNew, topicLabel }) {
+export default function NotesList({ notes, selectedId, search, setSearch, onSelect, onNew, topicLabel, sidebarOpen, topics, selectedTopic, setSelectedTopic, showReminders, onSelectReminders }) {
   const filtered = notes.filter(n =>
     (n.title||'').toLowerCase().includes(search.toLowerCase()) ||
     (n.excerpt||'').toLowerCase().includes(search.toLowerCase())
   )
 
+  function handleTopicChange(e) {
+    const v = e.target.value
+    if (v === '__reminders__') { onSelectReminders(true); return }
+    onSelectReminders(false)
+    setSelectedTopic(v === '__all__' ? null : v === '__none__' ? 'none' : v)
+  }
+
+  const topicValue = showReminders ? '__reminders__' : selectedTopic === null ? '__all__' : selectedTopic === 'none' ? '__none__' : selectedTopic
+
   return (
     <div className="flex flex-col h-full" style={{background:'#FEFCF8',borderRight:'1px solid #e4ddd4'}}>
-      <div className="px-3 pt-4 pb-2 flex-shrink-0" style={{borderBottom:'1px solid #f0ece4'}}>
+      <div className="px-3 pt-3 pb-2 flex-shrink-0" style={{borderBottom:'1px solid #f0ece4'}}>
+        {/* Topic filter — shown only when sidebar is hidden */}
+        {!sidebarOpen && (
+          <div className="relative mb-2">
+            <select value={topicValue} onChange={handleTopicChange}
+              className="w-full text-xs font-medium rounded-lg pl-2 pr-6 py-1.5 appearance-none focus:outline-none cursor-pointer"
+              style={{background:'#FFF6E8',color:'#D4822E',border:'1px solid #F0D9A8'}}>
+              <option value="__all__">📋 Todas as notas</option>
+              <option value="__reminders__">🔔 Lembretes</option>
+              <option value="__none__">📋 Geral</option>
+              {(topics||[]).map(t=>(
+                <option key={t.id} value={t.id}>{t.emoji} {t.name}</option>
+              ))}
+            </select>
+            <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{color:'#D4822E'}}/>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold truncate" style={{color:'#1a1614'}}>{topicLabel}</span>
-          <button onClick={onNew} className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0"
+          {sidebarOpen && <span className="text-xs font-semibold truncate" style={{color:'#1a1614'}}>{topicLabel}</span>}
+          <button onClick={onNew} className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ml-auto"
             style={{background:'#FFF6E8',color:'#D4822E',border:'1px solid #F0D9A8'}}>
             <Plus size={12}/>
           </button>
