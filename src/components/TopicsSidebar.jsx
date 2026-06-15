@@ -6,11 +6,11 @@ import TopicForm from './TopicForm'
 
 function N({ label, icon, active, badge, onClick }) {
   return (
-    <button onClick={onClick} className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:opacity-80"
+    <button onClick={onClick} className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:opacity-80 text-left"
       style={{background:active?'#FFF6E8':'transparent',color:active?'#D4822E':'#5a4e44',borderLeft:active?'2px solid #E8A838':'2px solid transparent'}}>
-      <span style={{color:active?'#E8A838':'inherit'}}>{icon}</span>
-      <span className="text-xs font-medium truncate flex-1">{label}</span>
-      {badge&&<span className="text-[10px] font-bold px-1 py-0.5 rounded-full text-white" style={{background:'#EF4444'}}>{badge}</span>}
+      {icon && <span className="flex-shrink-0" style={{color:active?'#E8A838':'inherit'}}>{icon}</span>}
+      <span className="text-xs font-medium truncate flex-1 text-left">{label}</span>
+      {badge&&<span className="text-[10px] font-bold px-1 py-0.5 rounded-full text-white flex-shrink-0" style={{background:'#EF4444'}}>{badge}</span>}
     </button>
   )
 }
