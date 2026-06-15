@@ -56,8 +56,13 @@ export default function DashboardPanel({ reminders, setReminders, allNotes }) {
   const done    = reminders.filter(r => r.completed).sort((a,b) => b.due_date.localeCompare(a.due_date)).slice(0, 10)
 
   async function doToggle(r) {
-    try { const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 }); setReminders(p => p.map(x => x.id === r.id ? { ...x, ...u } : x)) }
-    catch { toast.error('Erro') }
+    try {
+      const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 })
+      setReminders(p => {
+        const updated = p.map(x => x.id === r.id ? { ...x, ...u } : x)
+        return u.next ? [...updated, u.next] : updated
+      })
+    } catch { toast.error('Erro') }
   }
   async function doDelete(id) {
     try { await api.reminders.delete(id); setReminders(p => p.filter(x => x.id !== id)) }

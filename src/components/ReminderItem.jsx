@@ -3,19 +3,22 @@ import { Check, Trash2, AlertCircle, Pencil, X } from 'lucide-react'
 import { fmtDue } from '@/lib/api'
 import DateTimeField from './DateTimeField'
 
+const RECURRENCE_LABELS = { daily: '↻ Diária', weekly: '↻ Semanal', monthly: '↻ Mensal', yearly: '↻ Anual' }
+
 function EditForm({ r, allNotes, onSave, onCancel }) {
   const [title, setTitle] = useState(r.title)
   const [body, setBody] = useState(r.body || '')
   const [due, setDue] = useState(r.due_date || '')
   const [noteId, setNoteId] = useState(r.note_id || '')
+  const [recurrence, setRecurrence] = useState(r.recurrence || null)
   return (
-    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ ...r, title: title.trim(), body: body || null, due_date: due, note_id: noteId || null }) }}
+    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ ...r, title: title.trim(), body: body || null, due_date: due, note_id: noteId || null, recurrence: recurrence || null }) }}
       className="p-2 rounded-lg" style={{ background: '#FFFCF8', border: '1px solid #e4ddd4' }}>
       <input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Título…"
         className="w-full text-xs font-medium bg-transparent focus:outline-none mb-1" style={{ color: '#1a1614' }} />
       <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Nota (opcional)…" rows={2}
         className="w-full text-xs bg-transparent focus:outline-none resize-none mb-1" style={{ color: '#5a4e44' }} />
-      <div className="mb-1.5"><DateTimeField value={due} onChange={setDue} /></div>
+      <div className="mb-1.5"><DateTimeField value={due} onChange={setDue} recurrence={recurrence} onRecurrenceChange={setRecurrence} /></div>
       {allNotes && allNotes.length > 0 && (
         <select value={noteId} onChange={e => setNoteId(e.target.value)}
           className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#7a6e64' }}>
@@ -58,9 +61,10 @@ export default function ReminderItem({ r, allNotes, onToggle, onDelete, onEdit }
         </p>
         {r.body && <p className="text-xs mt-0.5 truncate" style={{ color: '#7a6e64' }}>{r.body}</p>}
         {r.note_title && <p className="text-[10px] mt-0.5" style={{ color: '#a89f96' }}>📝 {r.note_title}</p>}
-        <div className="flex items-center gap-1 mt-1">
+        <div className="flex items-center gap-1 mt-1 flex-wrap">
           {overdue && !r.completed && <AlertCircle size={10} style={{ color: '#EF4444' }} />}
           <span className="text-[10px]" style={{ color: overdue && !r.completed ? '#EF4444' : '#a89f96' }}>{label}</span>
+          {r.recurrence && <span className="text-[10px] px-1 py-0.5 rounded" style={{ background: '#FFF6E8', color: '#D4822E' }}>{RECURRENCE_LABELS[r.recurrence]}</span>}
         </div>
       </div>
       <div className="flex gap-0.5 flex-shrink-0">

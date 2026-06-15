@@ -10,14 +10,15 @@ function ReminderForm({ notes, onSave, onCancel }) {
   const [body, setBody] = useState('')
   const [due, setDue] = useState('')
   const [noteId, setNoteId] = useState('')
+  const [recurrence, setRecurrence] = useState(null)
   return (
-    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ title: title.trim(), body: body || null, due_date: due, note_id: noteId || null }) }}
+    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ title: title.trim(), body: body || null, due_date: due, note_id: noteId || null, recurrence: recurrence || null }) }}
       className="p-3 rounded-lg" style={{ background: '#FFFCF8', border: '1px solid #e4ddd4' }}>
       <input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Título do lembrete…"
         className="w-full text-xs bg-transparent focus:outline-none mb-1.5 font-medium" style={{ color: '#1a1614' }} />
       <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Nota (opcional)…" rows={2}
         className="w-full text-xs bg-transparent focus:outline-none resize-none mb-1.5" style={{ color: '#5a4e44' }} />
-      <div className="mb-2"><DateTimeField value={due} onChange={setDue} /></div>
+      <div className="mb-2"><DateTimeField value={due} onChange={setDue} recurrence={recurrence} onRecurrenceChange={setRecurrence} /></div>
       {notes.length > 0 && (
         <select value={noteId} onChange={e => setNoteId(e.target.value)}
           className="w-full text-xs bg-transparent focus:outline-none mb-2" style={{ color: '#7a6e64' }}>
@@ -46,8 +47,13 @@ export default function RemindersPanel({ reminders, setReminders, allNotes }) {
     catch { toast.error('Erro ao criar') }
   }
   async function doToggle(r) {
-    try { const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 }); setReminders(p => p.map(x => x.id === r.id ? { ...x, ...u } : x)) }
-    catch { toast.error('Erro') }
+    try {
+      const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 })
+      setReminders(p => {
+        const updated = p.map(x => x.id === r.id ? { ...x, ...u } : x)
+        return u.next ? [...updated, u.next] : updated
+      })
+    } catch { toast.error('Erro') }
   }
   async function doEdit(updated) {
     try { const u = await api.reminders.update(updated.id, updated); setReminders(p => p.map(x => x.id === updated.id ? { ...x, ...u } : x)); toast.success('Lembrete actualizado') }
