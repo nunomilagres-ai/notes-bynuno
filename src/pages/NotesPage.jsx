@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { LogOut } from 'lucide-react'
+import { LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { api, gid } from '@/lib/api'
 import { useAuth } from '@/lib/AuthContext'
 import { startNotificationService } from '@/lib/NotificationService'
@@ -19,6 +19,7 @@ export default function NotesPage() {
   const [showReminders, setShowReminders] = useState(false)
   const [search, setSearch] = useState('')
   const [mobilePane, setMobilePane] = useState('sidebar') // sidebar | list | editor
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // Load initial data
   useEffect(() => {
@@ -89,6 +90,9 @@ export default function NotesPage() {
       {/* Topbar */}
       <header className="flex items-center justify-between px-4 h-11 flex-shrink-0" style={{background:'#FFFCF8',borderBottom:'1px solid #e4ddd4'}}>
         <div className="flex items-center gap-2">
+          <button onClick={()=>setSidebarOpen(o=>!o)} className="p-1 rounded hover:opacity-70 hidden md:flex items-center" title={sidebarOpen?'Esconder temas':'Mostrar temas'}>
+            {sidebarOpen ? <PanelLeftClose size={15} style={{color:'#a89f96'}}/> : <PanelLeftOpen size={15} style={{color:'#a89f96'}}/>}
+          </button>
           <span className="text-base">🗒️</span>
           <span className="text-sm font-semibold" style={{color:'#1a1614'}}>Notes</span>
           <span className="text-xs" style={{color:'#c8bfb6'}}>by Nuno</span>
@@ -101,7 +105,7 @@ export default function NotesPage() {
       </header>
       {/* 3-col desktop / mobile panes */}
       <div className="flex flex-1 overflow-hidden">
-        <div className={`${mobilePane==='sidebar'?'flex':'hidden'} md:flex flex-col w-full md:w-52 lg:w-60 flex-shrink-0`} style={{borderRight:'1px solid #e4ddd4'}}>{sidebar}</div>
+        {sidebarOpen && <div className={`${mobilePane==='sidebar'?'flex':'hidden'} md:flex flex-col w-full md:w-52 lg:w-60 flex-shrink-0`} style={{borderRight:'1px solid #e4ddd4'}}>{sidebar}</div>}
         <div className={`${mobilePane==='list'?'flex':'hidden'} md:flex flex-col w-full md:w-56 lg:w-72 flex-shrink-0`} style={{borderRight:'1px solid #e4ddd4'}}>{list}</div>
         <div className={`${mobilePane==='editor'?'flex':'hidden'} md:flex flex-col flex-1 overflow-hidden`}>{editor}</div>
       </div>
