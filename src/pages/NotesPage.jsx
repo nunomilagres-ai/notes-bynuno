@@ -7,6 +7,7 @@ import TopicsSidebar from '@/components/TopicsSidebar'
 import NotesList from '@/components/NotesList'
 import NoteEditor from '@/components/NoteEditor'
 import RemindersPanel from '@/components/RemindersPanel'
+import DashboardPanel from '@/components/DashboardPanel'
 import { toast } from 'sonner'
 
 export default function NotesPage() {
@@ -67,23 +68,35 @@ export default function NotesPage() {
     setMobilePane('list')
   }
 
+  const [showDashboard, setShowDashboard] = useState(false)
+
   function handleSelectReminders(show) {
     setShowReminders(show)
+    setShowDashboard(false)
     setSelectedNote(null)
     if (show) setMobilePane('editor')
     else setMobilePane('list')
   }
 
+  function handleShowDashboard() {
+    setShowDashboard(true)
+    setShowReminders(false)
+    setSelectedNote(null)
+    setMobilePane('editor')
+  }
+
   const pendingReminders = reminders.filter(r => !r.completed).length
   const topicLabel = selectedTopic === null ? 'Todas as notas' : selectedTopic === 'none' ? '📋 Geral' : (topics.find(t => t.id === selectedTopic)?.name || 'Notas')
 
-  const sidebar = <TopicsSidebar topics={topics} setTopics={setTopics} selectedTopic={selectedTopic} setSelectedTopic={t=>{setSelectedTopic(t);setMobilePane('list')}} showReminders={showReminders} onSelectReminders={handleSelectReminders} pendingReminders={pendingReminders}/>
+  const sidebar = <TopicsSidebar topics={topics} setTopics={setTopics} selectedTopic={selectedTopic} setSelectedTopic={t=>{setSelectedTopic(t);setMobilePane('list');setShowDashboard(false)}} showReminders={showReminders} onSelectReminders={handleSelectReminders} pendingReminders={pendingReminders} onShowDashboard={handleShowDashboard} showDashboard={showDashboard}/>
   const list = <NotesList notes={notes} selectedId={selectedNote?.id} search={search} setSearch={setSearch} onSelect={openNote} onNew={newNote} topicLabel={topicLabel} sidebarOpen={sidebarOpen} topics={topics} selectedTopic={selectedTopic} setSelectedTopic={setSelectedTopic} showReminders={showReminders} onSelectReminders={handleSelectReminders}/>
-  const editor = showReminders
-    ? <RemindersPanel reminders={reminders} setReminders={setReminders} allNotes={notes}/>
-    : selectedNote
-      ? <NoteEditor key={selectedNote.id} note={selectedNote} topics={topics} onUpdate={handleUpdate} onDelete={handleDelete} onBack={()=>setMobilePane('list')}/>
-      : <div className="flex-1 flex flex-col items-center justify-center gap-3" style={{color:'#a89f96'}}><span className="text-4xl">🗒️</span><p className="text-sm">Seleciona ou cria uma nota</p><button onClick={newNote} className="px-4 py-2 rounded-xl text-sm text-white" style={{background:'linear-gradient(135deg,#E8A838,#D4822E)'}}>+ Nova nota</button></div>
+  const editor = showDashboard
+    ? <DashboardPanel reminders={reminders} setReminders={setReminders} allNotes={notes}/>
+    : showReminders
+      ? <RemindersPanel reminders={reminders} setReminders={setReminders} allNotes={notes}/>
+      : selectedNote
+        ? <NoteEditor key={selectedNote.id} note={selectedNote} topics={topics} onUpdate={handleUpdate} onDelete={handleDelete} onBack={()=>setMobilePane('list')} reminders={reminders} setReminders={setReminders}/>
+        : <div className="flex-1 flex flex-col items-center justify-center gap-3" style={{color:'#a89f96'}}><span className="text-4xl">🗒️</span><p className="text-sm">Seleciona ou cria uma nota</p><button onClick={newNote} className="px-4 py-2 rounded-xl text-sm text-white" style={{background:'linear-gradient(135deg,#E8A838,#D4822E)'}}>+ Nova nota</button></div>
 
   return (
     <div className="flex flex-col h-screen" style={{background:'#FAF7F2'}}>

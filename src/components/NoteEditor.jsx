@@ -3,8 +3,9 @@ import { Eye, EyeOff, Save, Pin, PinOff, Trash2, Camera } from 'lucide-react'
 import { api, renderMarkdown } from '@/lib/api'
 import { toast } from 'sonner'
 import PhotoCapture from './PhotoCapture'
+import NoteReminders from './NoteReminders'
 
-export default function NoteEditor({ note, topics, onUpdate, onDelete, onBack }) {
+export default function NoteEditor({ note, topics, onUpdate, onDelete, onBack, reminders, setReminders }) {
   const [title, setTitle] = useState(note.title||'')
   const [content, setContent] = useState(note.content||'')
   const [preview, setPreview] = useState(false)
@@ -87,6 +88,7 @@ export default function NoteEditor({ note, topics, onUpdate, onDelete, onBack })
               className="w-full h-full resize-none px-5 py-4 text-sm focus:outline-none font-mono leading-relaxed"
               style={{color:'#5a4e44',background:'transparent'}}/>}
       </div>
+      {reminders !== undefined && <NoteReminders noteId={note.id} reminders={reminders} setReminders={setReminders}/>}
     </div>
   )
 }
