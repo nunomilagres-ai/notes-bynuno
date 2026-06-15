@@ -5,15 +5,18 @@ import { api, fmtDue } from '@/lib/api'
 import { toast } from 'sonner'
 import DateTimeField from './DateTimeField'
 
+const RECURRENCE_LABELS = { daily: '↻ Diária', weekly: '↻ Semanal', monthly: '↻ Mensal', yearly: '↻ Anual' }
+
 function QuickForm({ noteId, onSave, onCancel }) {
   const [title, setTitle] = useState('')
   const [due, setDue] = useState('')
+  const [recurrence, setRecurrence] = useState(null)
   return (
-    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ title: title.trim(), due_date: due, note_id: noteId, body: null }) }}
+    <form onSubmit={e => { e.preventDefault(); title.trim() && due && onSave({ title: title.trim(), due_date: due, note_id: noteId, body: null, recurrence: recurrence || null }) }}
       className="flex flex-col gap-1 p-2 rounded-lg" style={{ background: '#FFFCF8', border: '1px solid #e4ddd4' }}>
       <input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Título da tarefa…"
         className="text-xs font-medium bg-transparent focus:outline-none" style={{ color: '#1a1614' }} />
-      <DateTimeField value={due} onChange={setDue} />
+      <DateTimeField value={due} onChange={setDue} recurrence={recurrence} onRecurrenceChange={setRecurrence} />
       <div className="flex gap-1.5 mt-0.5">
         <button type="submit" className="flex-1 py-1 rounded text-xs font-medium text-white flex items-center justify-center gap-1" style={{ background: '#E8A838' }}>
           <Check size={10} /> Criar
@@ -44,7 +47,10 @@ export default function NoteReminders({ noteId, reminders, setReminders }) {
   async function doToggle(r) {
     try {
       const u = await api.reminders.update(r.id, { ...r, completed: r.completed ? 0 : 1 })
-      setReminders(p => p.map(x => x.id === r.id ? { ...x, ...u } : x))
+      setReminders(p => {
+        const updated = p.map(x => x.id === r.id ? { ...x, ...u } : x)
+        return u.next ? [...updated, u.next] : updated
+      })
     } catch { toast.error('Erro') }
   }
 
@@ -88,6 +94,7 @@ export default function NoteReminders({ noteId, reminders, setReminders }) {
               </span>
               <span className="text-[10px] flex-shrink-0" style={{ color: overdue && !r.completed ? '#EF4444' : '#a89f96' }}>
                 {overdue && !r.completed && <AlertCircle size={9} className="inline mr-0.5" />}{label}
+                {r.recurrence && <span className="ml-1 px-1 rounded" style={{ background: '#FFF6E8', color: '#D4822E' }}>{RECURRENCE_LABELS[r.recurrence]}</span>}
               </span>
               <button onClick={() => doDelete(r.id)} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-50 flex-shrink-0">
                 <Trash2 size={10} style={{ color: '#c8bfb6' }} />
