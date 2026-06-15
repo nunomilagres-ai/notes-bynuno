@@ -5,7 +5,7 @@ pages_build_output_dir = "./dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "notes-bynuno-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "6e860584-0317-480a-a588-1c3e4237a6b7"
 
 [vars]
 APP_URL = "https://notes.bynuno.com"
