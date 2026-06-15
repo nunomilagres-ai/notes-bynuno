@@ -1,12 +1,14 @@
 import { useState, useRef, useCallback } from 'react'
-import { Eye, EyeOff, Save, Pin, PinOff, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Save, Pin, PinOff, Trash2, Camera } from 'lucide-react'
 import { api, renderMarkdown } from '@/lib/api'
 import { toast } from 'sonner'
+import PhotoCapture from './PhotoCapture'
 
 export default function NoteEditor({ note, topics, onUpdate, onDelete, onBack }) {
   const [title, setTitle] = useState(note.title||'')
   const [content, setContent] = useState(note.content||'')
   const [preview, setPreview] = useState(false)
+  const [showPhoto, setShowPhoto] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const timer = useRef(null)
@@ -41,10 +43,21 @@ export default function NoteEditor({ note, topics, onUpdate, onDelete, onBack })
     onDelete(note.id)
   }
 
+  function handlePhotoResult(r) {
+    setTitle(r.title); setContent(r.content)
+    scheduleAutoSave(r.title, r.content)
+    if (r.topic_id && r.topic_id !== note.topic_id) {
+      api.notes.update(note.id, { topic_id: r.topic_id })
+      onUpdate({ ...note, topic_id: r.topic_id })
+    }
+    setShowPhoto(false)
+  }
+
   const topic = topics.find(t=>t.id===note.topic_id)
 
   return (
     <div className="flex flex-col h-full" style={{background:'#fff'}}>
+      {showPhoto && <PhotoCapture topics={topics} onResult={handlePhotoResult} onClose={()=>setShowPhoto(false)}/>}
       <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0" style={{borderBottom:'1px solid #f0ece4'}}>
         {onBack && <button onClick={onBack} className="text-xs mr-1 hover:underline" style={{color:'#a89f96'}}>← Notas</button>}
         {topic && <span className="text-xs px-2 py-0.5 rounded-full" style={{background:topic.color+'22',color:topic.color}}>{topic.emoji} {topic.name}</span>}
@@ -53,6 +66,9 @@ export default function NoteEditor({ note, topics, onUpdate, onDelete, onBack })
           {saved && <span className="text-xs flex items-center gap-1" style={{color:'#E8A838'}}><Save size={10}/>Guardado</span>}
           <button onClick={()=>setPreview(p=>!p)} className="flex items-center gap-1 px-2 py-1 rounded text-xs" style={{background:'#f5f0e8',color:'#7a6e64'}}>
             {preview?<EyeOff size={11}/>:<Eye size={11}/>}{preview?'Editor':'Preview'}
+          </button>
+          <button onClick={()=>setShowPhoto(true)} className="p-1.5 rounded hover:bg-amber-50" title="Foto para nota (IA)">
+            <Camera size={12} style={{color:'#E8A838'}}/>
           </button>
           <button onClick={togglePin} className="p-1.5 rounded hover:bg-amber-50" title={note.pinned?'Desafixar':'Fixar'}>
             {note.pinned?<PinOff size={12} style={{color:'#E8A838'}}/>:<Pin size={12} style={{color:'#a89f96'}}/>}
