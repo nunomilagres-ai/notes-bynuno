@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import ReleaseNotes from '@/components/ReleaseNotes'
 import { api, gid } from '@/lib/api'
 import { useAuth } from '@/lib/AuthContext'
 import { startNotificationService } from '@/lib/NotificationService'
@@ -22,6 +23,7 @@ export default function NotesPage() {
   const [search, setSearch] = useState('')
   const [mobilePane, setMobilePane] = useState('sidebar') // sidebar | list | editor
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [showRelease, setShowRelease] = useState(false)
 
   // Load initial data
   useEffect(() => {
@@ -122,7 +124,9 @@ export default function NotesPage() {
           <span className="text-base">🗒️</span>
           <span className="text-sm font-semibold" style={{color:'#1a1614'}}>Notes</span>
           <span className="text-xs" style={{color:'#c8bfb6'}}>by Nuno</span>
+          <button onClick={()=>setShowRelease(true)} className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full hidden sm:block" style={{background:'#FFF6E8',color:'#D4822E',border:'1px solid #F0D9A8'}} title="Novidades">v1.2</button>
         </div>
+        {showRelease && <ReleaseNotes onClose={()=>setShowRelease(false)}/>}
         <div className="flex items-center gap-2">
           {user?.avatar_url && <img src={user.avatar_url} className="w-6 h-6 rounded-full" alt=""/>}
           <span className="text-xs hidden sm:block" style={{color:'#7a6e64'}}>{user?.name}</span>
