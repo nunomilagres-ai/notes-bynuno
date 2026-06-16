@@ -46,12 +46,14 @@ export async function onRequestPut({ request, env, params }) {
   let body
   try { body = await request.json() } catch { return badRequest('JSON inválido') }
 
-  const title      = body.title      !== undefined ? (body.title || '').trim()     : reminder.title
-  const bBody      = body.body       !== undefined ? (body.body || null)            : reminder.body
-  const due_date   = body.due_date   !== undefined ? (body.due_date || '').trim()  : reminder.due_date
-  const completed  = body.completed  !== undefined ? (body.completed ? 1 : 0)      : reminder.completed
-  const noteId     = body.note_id    !== undefined ? (body.note_id || null)         : reminder.note_id
-  const recurrence = body.recurrence !== undefined ? (body.recurrence || null)      : reminder.recurrence
+  const title              = body.title              !== undefined ? (body.title || '').trim()          : reminder.title
+  const bBody              = body.body               !== undefined ? (body.body || null)                : reminder.body
+  const due_date           = body.due_date           !== undefined ? (body.due_date || '').trim()      : reminder.due_date
+  const completed          = body.completed          !== undefined ? (body.completed ? 1 : 0)          : reminder.completed
+  const noteId             = body.note_id            !== undefined ? (body.note_id || null)             : reminder.note_id
+  const recurrence         = body.recurrence         !== undefined ? (body.recurrence || null)          : reminder.recurrence
+  const recurrenceEndDate  = body.recurrence_end_date !== undefined ? (body.recurrence_end_date || null) : reminder.recurrence_end_date
+  const recurrenceCount    = body.recurrence_count   !== undefined ? (body.recurrence_count || null)   : reminder.recurrence_count
 
   if (!title)    return badRequest('Título é obrigatório')
   if (!due_date) return badRequest('Data é obrigatória')
@@ -63,9 +65,10 @@ export async function onRequestPut({ request, env, params }) {
 
   await env.DB.prepare(
     `UPDATE note_reminders
-     SET title=?, body=?, due_date=?, completed=?, note_id=?, recurrence=?, notified=?, updated_date=?
+     SET title=?, body=?, due_date=?, completed=?, note_id=?, recurrence=?,
+         recurrence_end_date=?, recurrence_count=?, notified=?, updated_date=?
      WHERE id=? AND user_id=?`
-  ).bind(title, bBody, due_date, completed, noteId, recurrence, reminder.notified, ts, params.id, user.id).run()
+  ).bind(title, bBody, due_date, completed, noteId, recurrence, recurrenceEndDate, recurrenceCount, reminder.notified, ts, params.id, user.id).run()
 
   // Auto-create next occurrence for recurring reminders
   let nextReminder = null
@@ -81,7 +84,7 @@ export async function onRequestPut({ request, env, params }) {
     }
   }
 
-  return json({ id: params.id, title, body: bBody, due_date, completed, note_id: noteId, recurrence, updated_date: ts, next: nextReminder })
+  return json({ id: params.id, title, body: bBody, due_date, completed, note_id: noteId, recurrence, recurrence_end_date: recurrenceEndDate, recurrence_count: recurrenceCount, updated_date: ts, next: nextReminder })
 }
 
 export async function onRequestDelete({ request, env, params }) {
